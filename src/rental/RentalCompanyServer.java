@@ -3,6 +3,7 @@ package rental;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -10,26 +11,32 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-public class RentalServer {
+public class RentalCompanyServer {
 
 	public static void main(String[] args) throws ReservationException, NumberFormatException, IOException {
-		List<Car> cars = loadData("hertz.csv");
-		
 		try {
-			System.setSecurityManager(null);
 			
-			CarRentalCompany obj = new CarRentalCompany("Hertz", cars);
-            RentalInterface stub = (RentalInterface) UnicastRemoteObject.exportObject(obj, 0);
-
-            // Bind the remote object's stub in the registry
-            Registry registry = LocateRegistry.getRegistry();
-            registry.bind("Hertz", stub);
+            addCompany("hertz.csv" , "Hertz");
+            addCompany("dockx.csv" , "Dockx");
 
             System.err.println("Server ready");
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
             e.printStackTrace();
         }
+	}
+	
+	public static void addCompany(String file, String name) throws NumberFormatException, ReservationException, IOException, NotBoundException{
+		List<Car> cars = loadData(file);
+		
+		CarRentalCompany obj = new CarRentalCompany(name, cars);
+        RentalInterface stub = (RentalInterface) UnicastRemoteObject.exportObject(obj, 0);
+        Registry registry = LocateRegistry.getRegistry();
+        
+        SessionManagerInterface sessionManager = (SessionManagerInterface) registry.lookup("RentalAgency");
+        sessionManager.getManagerSession().registerRentalCompany(stub);
+        
+		
 	}
 
 	public static List<Car> loadData(String datafile)

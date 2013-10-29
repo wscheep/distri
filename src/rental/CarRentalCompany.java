@@ -102,7 +102,7 @@ public class CarRentalCompany implements RentalInterface{
 	 * RESERVATIONS *
 	 ****************/
 
-	public Quote createQuote(ReservationConstraints constraints, String client)
+	public synchronized Quote createQuote(ReservationConstraints constraints, String client)
 			throws ReservationException {
 		logger.log(Level.INFO, "<{0}> Creating tentative reservation for {1} with constraints {2}", 
                         new Object[]{name, client, constraints.toString()});
@@ -124,7 +124,7 @@ public class CarRentalCompany implements RentalInterface{
 						/ (1000 * 60 * 60 * 24D));
 	}
 
-	public Reservation confirmQuote(Quote quote) throws ReservationException {
+	public synchronized Reservation confirmQuote(Quote quote) throws ReservationException {
 		logger.log(Level.INFO, "<{0}> Reservation of {1}", new Object[]{name, quote.toString()});
 		List<Car> availableCars = getAvailableCars(quote.getCarType(), quote.getStartDate(), quote.getEndDate());
 		if(availableCars.isEmpty())
@@ -137,7 +137,7 @@ public class CarRentalCompany implements RentalInterface{
 		return res;
 	}
 
-	public void cancelReservation(Reservation res) {
+	public synchronized void cancelReservation(Reservation res) {
 		logger.log(Level.INFO, "<{0}> Cancelling reservation {1}", new Object[]{name, res.toString()});
 		getCar(res.getCarId()).removeReservation(res);
 	}
@@ -175,7 +175,7 @@ public class CarRentalCompany implements RentalInterface{
 	}
 	
 	@Override
-	public String getMostPopularCarType() {
+	public CarType getMostPopularCarType() {
 		HashMap<CarType, Integer> carTypeNum = new HashMap<CarType, Integer>();
 		
 		for(Car car: cars){
@@ -195,6 +195,6 @@ public class CarRentalCompany implements RentalInterface{
 			}
 		}
 		
-		return type.getName();
+		return type;
 	}
 }

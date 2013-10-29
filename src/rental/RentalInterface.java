@@ -14,9 +14,9 @@ public interface RentalInterface extends Remote{
 	public void cancelReservation(Reservation reservation) throws RemoteException, ReservationException;
 	public List<Reservation> getReservationsBy(String clientName) throws RemoteException;
 	public int getNumberOfReservationsForCarType(String carType)throws RemoteException;
-	public String getName();
-	public Collection<String> getCarTypes();
-	public int getTotalNumberOfReservations();
-	public String getMostPopularCarType();
+	public String getName() throws RemoteException;
+	public Collection<String> getCarTypes() throws RemoteException;
+	public int getTotalNumberOfReservations() throws RemoteException;
+	public CarType getMostPopularCarType() throws RemoteException;
 }
 		

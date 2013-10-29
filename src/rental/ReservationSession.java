@@ -3,6 +3,8 @@ package rental;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 public class ReservationSession implements ReservationSessionInterface {
 
@@ -28,7 +30,7 @@ public class ReservationSession implements ReservationSessionInterface {
 	}
 
 	@Override
-	public void confirmQuotes() throws ReservationException, RemoteException {
+	public synchronized List<Reservation> confirmQuotes() throws ReservationException, RemoteException {
 		ArrayList<Reservation> reservations = new ArrayList<Reservation>();
 		for(Quote quote: currentQuotes){
 			RentalInterface company = NamingService.lookUp(quote.getRentalCompany());
@@ -39,6 +41,8 @@ public class ReservationSession implements ReservationSessionInterface {
 				e.printStackTrace();
 			} 
 		}
+		
+		return reservations;
 	}	
 	
 	private void cancelReservations(ArrayList<Reservation> reservations) throws ReservationException, RemoteException {
@@ -47,5 +51,19 @@ public class ReservationSession implements ReservationSessionInterface {
 	       }
 	       throw new ReservationException("Canceled All Reservations.");
 	   }
+
+	@Override
+	public Collection<CarType> getAvailableCarTypes(Date start, Date end)
+			throws RemoteException, ReservationException {
+		ArrayList<CarType> carTypes = new ArrayList<CarType>();
+		
+		for(String carRental: NamingService.getCarRentalCompanies()){
+			RentalInterface cr = NamingService.lookUp(carRental);
+			
+			carTypes.addAll(cr.getAvailableCarTypes(start, end));
+		}
+		
+		return carTypes;
+	}
 
 }

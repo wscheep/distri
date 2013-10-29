@@ -6,13 +6,13 @@ import java.util.Collection;
 public class ManagerSession implements ManagerSessionInterface {
 
 	@Override
-	public void registerRentalCompany(RentalInterface carRentalCompany) {
+	public synchronized void registerRentalCompany(RentalInterface carRentalCompany) throws RemoteException {
 		NamingService.registerCarRentalCompany(carRentalCompany);
 		
 	}
 
 	@Override
-	public void unRegisterRentalCompany(String carRentalCompanyName) {
+	public synchronized void unRegisterRentalCompany(String carRentalCompanyName) {
 		NamingService.unRegisterCarRentalCompany(carRentalCompanyName);
 		
 	}
@@ -23,7 +23,7 @@ public class ManagerSession implements ManagerSessionInterface {
 	}
 
 	@Override
-	public Collection<String> getCarTypesOf(String rentalCompany) {
+	public Collection<String> getCarTypesOf(String rentalCompany) throws RemoteException {
 		RentalInterface company = NamingService.lookUp(rentalCompany);
 		return company.getCarTypes();
 		
@@ -36,7 +36,7 @@ public class ManagerSession implements ManagerSessionInterface {
 	}
 
 	@Override
-	public String getMostPopularRentalCompany() {
+	public String getMostPopularRentalCompany() throws RemoteException {
 		String mostPopularCompany = "";
 		int max = 0;
 		for(String company: NamingService.getCarRentalCompanies()){
@@ -50,7 +50,7 @@ public class ManagerSession implements ManagerSessionInterface {
 	}
 
 	@Override
-	public String getMostPopularCarType(String rentalCompany) {
+	public CarType getMostPopularCarType(String rentalCompany) throws RemoteException {
 		return NamingService.lookUp(rentalCompany).getMostPopularCarType();
 	}
 

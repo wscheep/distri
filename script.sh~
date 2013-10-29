@@ -1,0 +1,11 @@
+clear
+
+
+echo "Compiling java src"
+cd src
+javac *.java
+cd ..
+cd bin
+rmiregistry
+cd ..
+
